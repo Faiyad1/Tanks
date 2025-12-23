@@ -1,0 +1,653 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>App.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">tanks_scaffold</a> &gt; <a href="index.source.html" class="el_package">Tanks</a> &gt; <span class="el_source">App.java</span></div><h1>App.java</h1><pre class="source lang-java linenums">package Tanks;
+
+import processing.core.PApplet;
+import processing.core.PImage;
+import processing.data.JSONArray;
+import processing.data.JSONObject;
+import processing.event.KeyEvent;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
+
+public class App extends PApplet {
+
+    public static final int CELLSIZE = 32; //8;
+    public static final int CELLHEIGHT = 32;
+
+<span class="fc" id="L21">    public static int WIDTH = 864; //CELLSIZE*BOARD_WIDTH;</span>
+<span class="fc" id="L22">    public static int HEIGHT = 640; //BOARD_HEIGHT*CELLSIZE+TOPBAR;</span>
+
+    public static final int FPS = 30;
+    public String configPath;
+<span class="fc" id="L26">    public static Random random = new Random();</span>
+
+
+<span class="fc" id="L29">    public static char currentPlayer = 'A';</span>
+<span class="fc" id="L30">    public static char[] playerArray = {'A', 'B', 'C', 'D'};</span>
+
+    public static Tank currentTank;
+<span class="fc" id="L33">    public static ArrayList&lt;Character&gt; tankList = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L34">    public static Map&lt;Character, Tank&gt; tankMap = new HashMap&lt;&gt;();</span>
+
+<span class="fc" id="L36">    public static ArrayList&lt;Projectile&gt; projectileList = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L37">    public static ArrayList&lt;int[]&gt; blastList = new ArrayList&lt;&gt;();</span>
+
+<span class="fc" id="L39">    public static Map&lt;Character, Integer&gt; playerScoreMap = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L40">    public static ArrayList&lt;Character&gt; sortedScoreBoardList = new ArrayList&lt;&gt;();</span>
+
+
+<span class="fc" id="L43">    public static Map&lt;Integer, Integer&gt; terrain = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L44">    public static ArrayList&lt;Integer&gt; treeList = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L45">    public static Map&lt;Character, int[]&gt; playerColourMap = new HashMap&lt;&gt;();</span>
+
+<span class="fc" id="L47">    public static String[] layout = new String[3];</span>
+<span class="fc" id="L48">    public static String[] background = new String[3];</span>
+<span class="fc" id="L49">    public static int[] foregroundColour = new int[3];</span>
+<span class="fc" id="L50">    public static int[][] foregroundColourArray = new int[3][3];</span>
+<span class="fc" id="L51">    public static String[] trees = new String[3];;</span>
+
+
+    public static PImage pimgBackground;
+    public static PImage pimgTree;
+
+    public static PImage pimgFuel;
+    public static PImage pimgParachute;
+    public static PImage pimgParachuteTank;
+    public static PImage pimgWindRight;
+    public static PImage pimgWindLeft;
+
+
+<span class="fc" id="L64">    public static int currentLevel = 0;</span>
+    public static int wind;
+<span class="fc" id="L66">    public static int endTime = 0;</span>
+<span class="fc" id="L67">    public static boolean gameOver = false;</span>
+
+
+<span class="fc" id="L70">    public App() {</span>
+<span class="fc" id="L71">        this.configPath = &quot;config.json&quot;;</span>
+<span class="fc" id="L72">    }</span>
+
+    /**
+     * Initialise the setting of the window size.
+     */
+    @Override
+    public void settings() {
+<span class="fc" id="L79">        size(WIDTH, HEIGHT);</span>
+<span class="fc" id="L80">    }</span>
+
+    /**
+     * Load all resources such as images. Initialise the elements such as the player and map elements.
+     */
+    @Override
+    public void setup() {
+<span class="fc" id="L87">        frameRate(FPS);</span>
+
+<span class="fc" id="L89">        JSONObject config = loadJSONObject(configPath);</span>
+<span class="fc" id="L90">        JSONArray jsonLevels = config.getJSONArray(&quot;levels&quot;);</span>
+
+        //Getting and saving address for unlimited levels
+<span class="fc bfc" id="L93" title="All 2 branches covered.">        for (int i = 0; i &lt; 3; i++){</span>
+<span class="fc" id="L94">            JSONObject jsonLvl = jsonLevels.getJSONObject(i);</span>
+
+<span class="fc" id="L96">            layout[i] = jsonLvl.getString(&quot;layout&quot;);</span>
+<span class="fc" id="L97">            background [i] = jsonLvl.getString(&quot;background&quot;);</span>
+
+            //foreground colour
+<span class="fc" id="L100">            String tempFGC = jsonLvl.getString(&quot;foreground-colour&quot;);</span>
+<span class="fc" id="L101">            String[] fgc = tempFGC.split(&quot;,&quot;);</span>
+<span class="fc bfc" id="L102" title="All 2 branches covered.">            for (int j = 0; j &lt; 3; j++) {</span>
+<span class="fc" id="L103">                int k = Integer.parseInt(fgc[j]);</span>
+<span class="fc" id="L104">                foregroundColourArray[i][j] = k;</span>
+            }
+
+            //trees
+            try {
+<span class="fc" id="L109">                trees[i] = jsonLvl.getString(&quot;trees&quot;);</span>
+<span class="nc" id="L110">            } catch (Exception e) {</span>
+<span class="nc" id="L111">                trees[i] = null;</span>
+<span class="fc" id="L112">            }</span>
+        }
+
+        //Getting player details from json file for tank colour
+<span class="fc" id="L116">        JSONObject jsonplr = config.getJSONObject(&quot;player_colours&quot;);</span>
+<span class="fc bfc" id="L117" title="All 2 branches covered.">        for (char i : playerArray) {</span>
+<span class="fc" id="L118">            String playerCl = jsonplr.getString(String.valueOf(i));</span>
+<span class="fc" id="L119">            String[] playerColo = playerCl.split(&quot;,&quot;);</span>
+
+<span class="fc" id="L121">            int[] playerColour = new int[3];</span>
+<span class="fc" id="L122">            int kk = 0;</span>
+<span class="fc bfc" id="L123" title="All 2 branches covered.">            for (String ii : playerColo) {</span>
+<span class="fc" id="L124">                int j = Integer.parseInt(ii);</span>
+<span class="fc" id="L125">                playerColour[kk] = j;</span>
+<span class="fc" id="L126">                kk++;</span>
+            }
+<span class="fc" id="L128">            playerColourMap.put(i, playerColour);</span>
+        }
+
+        //Setting initial score
+<span class="fc bfc" id="L132" title="All 2 branches covered.">        for (char i : playerArray) {</span>
+<span class="fc" id="L133">            playerScoreMap.put(i, 0);</span>
+        }
+
+        //icons
+<span class="fc" id="L137">        pimgFuel = loadImage(&quot;Tanks/fuel.png&quot;);</span>
+<span class="fc" id="L138">        pimgFuel.resize(0, 26);</span>
+<span class="fc" id="L139">        pimgParachute = loadImage(&quot;Tanks/parachute.png&quot;);</span>
+<span class="fc" id="L140">        pimgParachute.resize(0, 26);</span>
+<span class="fc" id="L141">        pimgParachuteTank = loadImage(&quot;Tanks/parachute.png&quot;);</span>
+<span class="fc" id="L142">        pimgParachuteTank.resize(0, 60);</span>
+<span class="fc" id="L143">        pimgWindRight = loadImage(&quot;Tanks/wind.png&quot;);</span>
+<span class="fc" id="L144">        pimgWindRight.resize(0, 55);</span>
+<span class="fc" id="L145">        pimgWindLeft = loadImage(&quot;Tanks/wind-1.png&quot;);</span>
+<span class="fc" id="L146">        pimgWindLeft.resize(0, 55);</span>
+
+<span class="fc" id="L148">        definedLevels();</span>
+<span class="fc" id="L149">    }</span>
+
+    /**
+     * Load and initialise the elements for first 3 levels.
+     */
+    public void definedLevels(){
+<span class="fc" id="L155">        pimgBackground = loadImage(&quot;Tanks/&quot; + background[currentLevel]);</span>
+
+<span class="fc" id="L157">        foregroundColour = foregroundColourArray[currentLevel];</span>
+
+<span class="fc bfc" id="L159" title="All 2 branches covered.">        if (trees[currentLevel] != null) {</span>
+<span class="fc" id="L160">            pimgTree = loadImage(&quot;Tanks/&quot; + trees[currentLevel]);</span>
+<span class="fc" id="L161">            pimgTree.resize(0, 36);</span>
+        } else{
+<span class="fc" id="L163">            pimgTree = null;</span>
+        }
+
+        //getting all coordinates from txt file
+        try {
+<span class="fc" id="L168">            BufferedReader br = new BufferedReader(new FileReader(layout[currentLevel]));</span>
+
+            String pos;
+<span class="fc" id="L171">            int xaxis = 0;</span>
+<span class="fc" id="L172">            int yaxis = 0;</span>
+<span class="fc" id="L173">            treeList = new ArrayList&lt;&gt;();</span>
+
+<span class="fc bfc" id="L175" title="All 2 branches covered.">            while ((pos = br.readLine()) != null) {</span>
+<span class="fc" id="L176">                char[] p = pos.toCharArray();</span>
+<span class="fc" id="L177">                xaxis = 0;</span>
+
+<span class="fc bfc" id="L179" title="All 2 branches covered.">                for (char j : p) {</span>
+<span class="fc bfc" id="L180" title="All 2 branches covered.">                    if (j == ' ') {</span>
+                    }
+<span class="fc bfc" id="L182" title="All 2 branches covered.">                    else if (j == 'X') {              //terrain coordinates</span>
+<span class="fc bfc" id="L183" title="All 2 branches covered.">                        for (int i = 0; i &lt; CELLSIZE; i++) {</span>
+<span class="fc" id="L184">                            terrain.put(xaxis * CELLSIZE + i, yaxis * CELLHEIGHT);</span>
+                        }
+                    }
+<span class="fc bfc" id="L187" title="All 2 branches covered.">                    else if (j == 'T') {             //tree coordinates</span>
+<span class="fc" id="L188">                        treeList.add(xaxis * CELLSIZE);</span>
+                    }
+                    else {                           //tank coordinates
+<span class="fc bfc" id="L191" title="All 2 branches covered.">                        for (char i : playerArray) {</span>
+<span class="fc bfc" id="L192" title="All 2 branches covered.">                            if (i == j) {</span>
+<span class="fc" id="L193">                                Tank t = new Tank(j, xaxis * 32);</span>
+<span class="fc" id="L194">                                tankMap.put(j, t);</span>
+<span class="fc bfc" id="L195" title="All 2 branches covered.">                                if (j == 'A') {</span>
+<span class="fc" id="L196">                                    currentTank = t;</span>
+                                }
+                            }
+                        }
+                    }
+<span class="fc" id="L201">                    xaxis++;</span>
+                }
+<span class="fc" id="L203">                yaxis++;</span>
+<span class="fc" id="L204">            }</span>
+<span class="nc" id="L205">        } catch (Exception e) {</span>
+<span class="fc" id="L206">        }</span>
+
+<span class="fc" id="L208">        levelInterface();</span>
+<span class="fc" id="L209">    }</span>
+
+    /**
+     * Resetting values and calling common operations (like moving average) after every level.
+     */
+    public void levelInterface() {
+        //Setting up and smoothing terrain
+<span class="fc" id="L216">        movingAverageTerrain();</span>
+<span class="fc" id="L217">        movingAverageTerrain();</span>
+
+        //player list of only char
+<span class="fc" id="L220">        tankList = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L221" title="All 2 branches covered.">        for (char i : playerArray) {</span>
+<span class="fc" id="L222">            tankList.add(i);</span>
+        }
+
+        //Resetting values after every level
+<span class="fc" id="L226">        currentPlayer = 'A';</span>
+<span class="fc" id="L227">        projectileList = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L228">        wind = random.nextInt(71) - 35;</span>
+<span class="fc" id="L229">        endTime = 0;</span>
+<span class="fc" id="L230">    }</span>
+
+    /**
+     * Calculating moving average for smoothening terrain.
+     */
+    public void movingAverageTerrain(){
+<span class="fc bfc" id="L236" title="All 2 branches covered.">        for (int i = 0; i &lt; WIDTH; i++) {</span>
+<span class="fc" id="L237">            int sum = 0;</span>
+<span class="fc bfc" id="L238" title="All 2 branches covered.">            for (int j = i; j &lt; i + 32; j++) {</span>
+<span class="fc" id="L239">                sum += terrain.get(j);</span>
+            }
+<span class="fc" id="L241">            terrain.put(i, sum / 32);</span>
+        }
+<span class="fc" id="L243">    }</span>
+
+    /**
+     * Extension: Unlimited levels
+     * Loading images and positions of with random numbers
+     */
+    public void unlimitedLevels(){
+<span class="fc" id="L250">        pimgBackground = loadImage(&quot;Tanks/&quot; + background[random.nextInt(3)]);</span>
+
+<span class="fc" id="L252">        foregroundColour = foregroundColourArray[random.nextInt(3)];</span>
+
+<span class="fc" id="L254">        int no = random.nextInt(3);</span>
+<span class="pc bpc" id="L255" title="1 of 2 branches missed.">        if (trees[no] != null) {</span>
+<span class="fc" id="L256">            pimgTree = loadImage(&quot;Tanks/&quot; + trees[no]);</span>
+<span class="fc" id="L257">            pimgTree.resize(0, 36);</span>
+        } else{
+<span class="nc" id="L259">            pimgTree = null;</span>
+        }
+
+        //setting players
+<span class="fc" id="L263">        ArrayList&lt;Integer&gt; tempNumList = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L264" title="All 2 branches covered.">        for (int i=0; i &lt; 4; i++){</span>
+<span class="fc" id="L265">            char j = playerArray[i];</span>
+<span class="fc" id="L266">            int num = 0;</span>
+<span class="fc" id="L267">            boolean similar = true;</span>
+<span class="fc bfc" id="L268" title="All 2 branches covered.">            while (similar) {</span>
+<span class="fc" id="L269">                num = random.nextInt(WIDTH);</span>
+<span class="fc" id="L270">                similar = false;</span>
+<span class="fc bfc" id="L271" title="All 2 branches covered.">                for (int k : tempNumList) {</span>
+<span class="fc bfc" id="L272" title="All 2 branches covered.">                    if (abs(num - k) &lt; 100) { //Each tank is atleast 100 pixel away from the center of tanks</span>
+<span class="fc" id="L273">                        similar = true;</span>
+                    }
+<span class="fc" id="L275">                }</span>
+            }
+
+<span class="fc" id="L278">            tempNumList.add(num);</span>
+<span class="fc" id="L279">            Tank t = new Tank(j, num);</span>
+<span class="fc" id="L280">            tankMap.put(j, t);</span>
+
+<span class="fc bfc" id="L282" title="All 2 branches covered.">            if (i == 0) {</span>
+<span class="fc" id="L283">                currentTank = t;</span>
+            }
+        }
+
+        //Setting tree
+<span class="pc bpc" id="L288" title="1 of 2 branches missed.">        if (pimgTree != null){</span>
+<span class="fc" id="L289">            treeList = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L290">            tempNumList = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L291">            tempNumList.add(random.nextInt(WIDTH));</span>
+
+<span class="fc bfc" id="L293" title="All 2 branches covered.">            for (int i=1; i &lt; 10; i++){</span>
+<span class="fc" id="L294">                boolean similar = true;</span>
+<span class="fc" id="L295">                int num = 0;</span>
+
+<span class="fc bfc" id="L297" title="All 2 branches covered.">                while (similar) {</span>
+<span class="fc" id="L298">                    num = random.nextInt(WIDTH);</span>
+<span class="fc" id="L299">                    similar = false;</span>
+<span class="fc bfc" id="L300" title="All 2 branches covered.">                    for (int k : tempNumList) {</span>
+<span class="fc bfc" id="L301" title="All 2 branches covered.">                        if (abs(num - k) &lt; 50) {   //Each tree is atleast 50 pixel away</span>
+<span class="fc" id="L302">                            similar = true;</span>
+                        }
+<span class="fc" id="L304">                    }</span>
+                }
+
+<span class="fc" id="L307">                tempNumList.add(num);</span>
+<span class="fc" id="L308">                treeList.add(num);</span>
+            }
+        }
+
+        //Setting terrain in blocks of 32 units
+<span class="fc" id="L313">        int currentnum = 0;</span>
+<span class="fc" id="L314">        tempNumList = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L315">        int num = 0;</span>
+
+        //Setting initial terrain (x-axis at 0 block) which starts from 5*CELLSIZE to 13*CELLSIZE on y axis
+<span class="fc" id="L318">        num = random.nextInt(8) + 6;</span>
+<span class="fc" id="L319">        tempNumList.add(num);</span>
+<span class="fc" id="L320">        currentnum = num;</span>
+
+        //Setting terrain for rest of the blocks
+<span class="fc bfc" id="L323" title="All 2 branches covered.">        for (int i=1; i &lt; 28; i++){</span>
+<span class="fc" id="L324">            boolean outOfRange = true;</span>
+<span class="fc bfc" id="L325" title="All 2 branches covered.">            while (outOfRange) {</span>
+<span class="fc" id="L326">                num = random.nextInt(7) -3;   //Changes by maximum 3*CELLSIZE</span>
+<span class="pc bpc" id="L327" title="1 of 4 branches missed.">                if (currentnum + num &gt; 3 &amp;&amp; currentnum + num &lt; 15){</span>
+<span class="fc" id="L328">                    outOfRange = false;</span>
+                }
+            }
+<span class="fc" id="L331">            tempNumList.add(currentnum + num);</span>
+        }
+
+        //Setting terrain for each unit
+<span class="fc" id="L335">        int xaxis = 0;</span>
+<span class="fc bfc" id="L336" title="All 2 branches covered.">        for (int i: tempNumList){</span>
+<span class="fc bfc" id="L337" title="All 2 branches covered.">            for (int j = 0; j &lt; CELLSIZE; j++) {</span>
+<span class="fc" id="L338">                terrain.put(xaxis * CELLSIZE + j, i * CELLHEIGHT);</span>
+            }
+<span class="fc" id="L340">            xaxis++;</span>
+<span class="fc" id="L341">        }</span>
+
+<span class="fc" id="L343">        levelInterface();</span>
+<span class="fc" id="L344">    }</span>
+
+
+    /**
+     * Receive key pressed signal from the keyboard.
+     */
+    @Override
+    public void keyPressed(KeyEvent event) {
+<span class="nc bnc" id="L352" title="All 2 branches missed.">        if (endTime == 0) {</span>
+<span class="nc" id="L353">            currentTank.keyAction(this, keyCode);</span>
+        }
+<span class="nc bnc" id="L355" title="All 4 branches missed.">        else if (keyCode == 32 &amp;&amp; !gameOver) {             //spacebar - next level is loaded</span>
+<span class="nc" id="L356">            changeLevel();</span>
+        }
+<span class="nc bnc" id="L358" title="All 6 branches missed.">        else if (keyCode == 82 &amp;&amp; gameOver &amp;&amp; endTime &gt; 21*3) {   //R - restart game</span>
+<span class="nc" id="L359">            playerScoreMap = new HashMap&lt;&gt;();</span>
+<span class="nc bnc" id="L360" title="All 2 branches missed.">            for (char i : playerArray) {</span>
+<span class="nc" id="L361">                playerScoreMap.put(i, 0);</span>
+            }
+<span class="nc" id="L363">            gameOver = false;</span>
+<span class="nc" id="L364">            currentLevel = 0;</span>
+<span class="nc" id="L365">            definedLevels();</span>
+        }
+<span class="nc bnc" id="L367" title="All 6 branches missed.">        else if(keyCode == 67 &amp;&amp; gameOver &amp;&amp; endTime &gt; 21*3){     //C - continue for unlimited levels with c</span>
+<span class="nc" id="L368">            gameOver = false;</span>
+<span class="nc" id="L369">            currentLevel++;</span>
+<span class="nc" id="L370">            unlimitedLevels();</span>
+        }
+<span class="nc" id="L372">    }</span>
+
+
+    /**
+     * Draw all elements in the game by current frame.
+     */
+    @Override
+    public void draw() {
+        //background
+<span class="fc" id="L381">        image(pimgBackground, 0, 0);</span>
+
+
+        //foreground
+<span class="fc bfc" id="L385" title="All 2 branches covered.">        for (int x = 0; x &lt; WIDTH; x++) {</span>
+<span class="fc" id="L386">            noStroke();</span>
+<span class="fc" id="L387">            fill(foregroundColour[0], foregroundColour[1], foregroundColour[2]);</span>
+<span class="fc" id="L388">            rect(x, terrain.get(x), 1, 800 - terrain.get(x));</span>
+        }
+
+        //trees
+<span class="fc bfc" id="L392" title="All 2 branches covered.">        if (pimgTree != null) {</span>
+<span class="fc bfc" id="L393" title="All 2 branches covered.">            for (int x : treeList) {</span>
+<span class="fc" id="L394">                image(pimgTree, x - 17, terrain.get(x) - 36);</span>
+<span class="fc" id="L395">            }</span>
+        }
+
+        //tanks
+<span class="fc bfc" id="L399" title="All 2 branches covered.">        for (int i = tankList.size() - 1; i &gt;= 0; i--) {</span>
+<span class="fc" id="L400">            char tank = tankList.get(i);</span>
+<span class="fc" id="L401">            tankMap.get(tank).drawTank(this);</span>
+        }
+
+        //projectiles
+<span class="fc bfc" id="L405" title="All 2 branches covered.">        for (int i = projectileList.size() - 1; i &gt;= 0; i--) {</span>
+<span class="fc" id="L406">            projectileList.get(i).executeProjectile(this);</span>
+        }
+
+        //tank explosion
+<span class="fc bfc" id="L410" title="All 2 branches covered.">        if (blastList.size() &gt; 0) {</span>
+<span class="fc" id="L411">            exploding();</span>
+        }
+
+        //HUD
+<span class="fc" id="L415">        headsUpDisplay();</span>
+
+
+<span class="fc bfc" id="L418" title="All 2 branches covered.">        if (!gameOver) {</span>
+            //scoreboard
+<span class="fc" id="L420">            stroke(0, 0, 0);</span>
+<span class="fc" id="L421">            strokeWeight(4);</span>
+<span class="fc" id="L422">            noFill();</span>
+<span class="fc" id="L423">            rect(707, 60, 143, 115);</span>
+<span class="fc" id="L424">            fill(0, 0, 0);</span>
+<span class="fc" id="L425">            line(707, 85, 850, 85);</span>
+<span class="fc" id="L426">            text(&quot;Scores&quot;, 715, 78);</span>
+<span class="fc" id="L427">            int jj = 0;</span>
+<span class="fc bfc" id="L428" title="All 2 branches covered.">            for (char i : playerArray) {</span>
+<span class="fc" id="L429">                int[] colr = playerColourMap.get(i);</span>
+<span class="fc" id="L430">                fill(colr[0], colr[1], colr[2]);</span>
+<span class="fc" id="L431">                text(&quot;Player &quot; + i, 715, 105 + jj);</span>
+<span class="fc" id="L432">                fill(0, 0, 0);</span>
+<span class="fc" id="L433">                text(playerScoreMap.get(i), 820, 105 + jj);</span>
+<span class="fc" id="L434">                jj += 20;</span>
+            }
+<span class="fc" id="L436">        } else {</span>
+            //End game Final scores
+            //text above box
+<span class="fc" id="L439">            char j = sortedScoreBoardList.get(0);</span>
+<span class="fc" id="L440">            int[] colorT = playerColourMap.get(j);</span>
+<span class="fc" id="L441">            fill(colorT[0], colorT[1], colorT[2]);</span>
+<span class="fc" id="L442">            textSize(22);</span>
+<span class="fc" id="L443">            text(&quot;Player &quot;+sortedScoreBoardList.get(0)+&quot; wins!&quot;,300, 125);</span>
+
+            //drawing box and line
+<span class="fc" id="L446">            stroke(0, 0, 0);</span>
+<span class="fc" id="L447">            strokeWeight(4);</span>
+<span class="fc" id="L448">            fill(colorT[0], colorT[1], colorT[2], 128);</span>
+<span class="fc" id="L449">            rect(275, 150, 350, 225);</span>
+<span class="fc" id="L450">            fill(0, 0, 0);</span>
+<span class="fc" id="L451">            line(275, 195, 625, 195);</span>
+<span class="fc" id="L452">            textSize(32);</span>
+
+<span class="fc" id="L454">            fill(0, 0, 0);</span>
+<span class="fc" id="L455">            text(&quot;Final Scores&quot;, 300, 185);</span>
+<span class="fc" id="L456">            int k = 0;</span>
+<span class="fc bfc" id="L457" title="All 2 branches covered.">            for (int i = 0; i &lt; 4; i++){</span>
+<span class="fc bfc" id="L458" title="All 2 branches covered.">                if(21*i &lt;= endTime){</span>
+<span class="fc" id="L459">                    j = sortedScoreBoardList.get(i);</span>
+<span class="fc" id="L460">                    int[] colorS = playerColourMap.get(j);</span>
+<span class="fc" id="L461">                    fill(colorS[0], colorS[1], colorS[2]);</span>
+
+<span class="fc" id="L463">                    text(&quot;Player &quot; + j, 300, 235 + k);</span>
+<span class="fc" id="L464">                    fill(0, 0, 0);</span>
+<span class="fc" id="L465">                    text(playerScoreMap.get(j), 555, 235 + k);</span>
+<span class="fc" id="L466">                    k += 40;</span>
+                }
+            }
+<span class="fc bfc" id="L469" title="All 2 branches covered.">            if (endTime &gt;= 21*3){</span>
+<span class="fc" id="L470">                textSize(22);</span>
+<span class="fc" id="L471">                fill(0,0,0);</span>
+<span class="fc" id="L472">                text(&quot;Press 'C' to continue&quot;, 315, 400);</span>
+            }
+        }
+
+
+        //level end
+<span class="fc bfc" id="L478" title="All 2 branches covered.">        if(tankList.size() &lt; 2){</span>
+<span class="fc" id="L479">            endTime++;</span>
+<span class="fc bfc" id="L480" title="All 4 branches covered.">            if (endTime &gt;= 30 &amp;&amp; !gameOver) {   //Waiting before going to next level - 1 sec</span>
+<span class="fc" id="L481">                changeLevel();</span>
+            }
+        }
+<span class="fc" id="L484">    }</span>
+
+    /**
+     * HUD which contains tank status like fuel, parachute, healthbar, power.
+     */
+    public void headsUpDisplay(){
+        //current player, fuel, parachute
+<span class="fc" id="L491">        fill(0, 0, 0);</span>
+<span class="fc" id="L492">        textSize(16);</span>
+<span class="fc" id="L493">        text(&quot;Player &quot; + currentPlayer + &quot;'s turn&quot;, 20, 29);</span>
+<span class="fc" id="L494">        text(currentTank.getFuel(), 210, 25);</span>
+<span class="fc" id="L495">        text(currentTank.getParachute(), 210, 55);</span>
+
+<span class="fc" id="L497">        image(pimgFuel, 175, 5);</span>
+<span class="fc" id="L498">        image(pimgParachute, 175, 35);</span>
+
+
+        //healthbar and power
+<span class="fc" id="L502">        noStroke();</span>
+<span class="fc" id="L503">        int h = currentTank.getHealth();</span>
+<span class="fc" id="L504">        int p = currentTank.getPower();</span>
+<span class="fc" id="L505">        text(&quot;Health:&quot;, 350, 30);</span>
+<span class="fc" id="L506">        text(h, 630, 30);</span>
+<span class="fc" id="L507">        text(&quot;Power:   &quot; + p, 350, 60);</span>
+
+<span class="fc" id="L509">        int[] col = playerColourMap.get(currentPlayer);</span>
+<span class="fc" id="L510">        fill(col[0], col[1], col[2]);</span>
+
+        //delete this code
+<span class="fc bfc" id="L513" title="All 2 branches covered.">        if (h &gt; 0) {</span>
+<span class="fc" id="L514">            rect(420, 10, h * 2, 26);   //health</span>
+        }
+
+<span class="fc" id="L517">        fill(255, 255, 255);</span>
+<span class="pc bpc" id="L518" title="1 of 2 branches missed.">        if (h &gt;= 0) {</span>
+<span class="fc" id="L519">            rect(420 + (h * 2), 10, 200 - (h * 2), 26);   //zerohealth</span>
+        } else {
+<span class="nc" id="L521">            rect(420 + (0), 10, 200, 26);   //zerohealth</span>
+        }
+<span class="fc" id="L523">        stroke(255, 0, 0);</span>
+
+
+<span class="fc" id="L526">        stroke(0, 0, 0);</span>
+<span class="fc" id="L527">        strokeWeight(4);</span>
+<span class="fc" id="L528">        noFill();</span>
+<span class="fc" id="L529">        rect(420, 10, 200, 26);   //health border</span>
+
+<span class="fc" id="L531">        stroke(128, 128, 128);</span>
+<span class="fc" id="L532">        strokeWeight(4);</span>
+<span class="fc" id="L533">        noFill();</span>
+<span class="fc" id="L534">        rect(420, 10, p * 2, 26);   //power border</span>
+<span class="fc" id="L535">        stroke(255, 0, 0);</span>
+<span class="fc" id="L536">        strokeWeight(0);</span>
+<span class="fc" id="L537">        line(420 + (p * 2) + 2, 4, 420 + (p * 2) + 2, 42);   //power line (redline)</span>
+
+        //wind
+<span class="fc" id="L540">        fill(0, 0, 0);</span>
+<span class="fc" id="L541">        text(Math.abs(wind), 823, 35);</span>
+<span class="fc bfc" id="L542" title="All 2 branches covered.">        if (wind &lt; 0) {</span>
+<span class="fc" id="L543">            image(pimgWindLeft, 750, 2);</span>
+        } else {
+<span class="fc" id="L545">            image(pimgWindRight, 750, 2);</span>
+        }
+<span class="fc" id="L547">    }</span>
+
+    /**
+     * Displaing explosion for both tank and projectile
+     */
+    public void exploding(){
+<span class="fc bfc" id="L553" title="All 2 branches covered.">        for (int i = blastList.size() - 1; i &gt;= 0; i--) {</span>
+<span class="fc" id="L554">            int[] blast = blastList.get(i);</span>
+
+<span class="fc" id="L556">            float aa = 30 * blast[2];</span>
+<span class="fc" id="L557">            float bb = 15 * blast[2];</span>
+<span class="fc" id="L558">            float cc = 6 * blast[2];</span>
+
+<span class="fc" id="L560">            float divisor = (float) (5f * blast[3]) / 30;</span>
+<span class="fc" id="L561">            aa *= divisor;</span>
+<span class="fc" id="L562">            bb *= divisor;</span>
+<span class="fc" id="L563">            cc *= divisor;</span>
+
+<span class="fc" id="L565">            noStroke();</span>
+<span class="fc" id="L566">            fill(255, 0, 0);</span>
+<span class="fc" id="L567">            ellipse(blast[0], blast[1], aa, aa);   //biggest outer circle</span>
+<span class="fc" id="L568">            strokeWeight(bb - cc);                 //middle circle</span>
+<span class="fc" id="L569">            fill(255, 255, 0);</span>
+<span class="fc" id="L570">            ellipse(blast[0], blast[1], cc, cc);   //smallest inner circle</span>
+<span class="fc" id="L571">            stroke(255, 165, 0);</span>
+<span class="fc" id="L572">            blast[3]++;</span>
+
+<span class="fc bfc" id="L574" title="All 2 branches covered.">            if (blast[3] == 6) {</span>
+<span class="fc" id="L575">                blastList.remove(i);</span>
+            }
+        }
+<span class="fc" id="L578">    }</span>
+
+    /**
+     * Switching between players.
+     */
+    public void nextPlayer(App app){
+<span class="pc bpc" id="L584" title="1 of 2 branches missed.">        for (int i = 0; i &lt; app.tankList.size(); i++){</span>
+<span class="fc" id="L585">            char temp = app.tankList.get(i);</span>
+
+<span class="fc bfc" id="L587" title="All 2 branches covered.">            if (temp == app.currentPlayer){</span>
+                char nextPlayer;
+
+<span class="fc bfc" id="L590" title="All 2 branches covered.">                if (i != app.tankList.size() - 1) {</span>
+<span class="fc" id="L591">                    nextPlayer = app.tankList.get(i + 1);</span>
+                }
+                else{
+<span class="fc" id="L594">                    nextPlayer = app.tankList.get(0);</span>
+                }
+<span class="fc" id="L596">                app.currentPlayer = nextPlayer;</span>
+<span class="fc" id="L597">                app.currentTank = app.tankMap.get(nextPlayer);</span>
+<span class="fc" id="L598">                break;</span>
+
+            }
+        }
+<span class="fc" id="L602">    }</span>
+
+    /**
+     * Switching between levels.
+     */
+    public void changeLevel() {
+<span class="fc bfc" id="L608" title="All 2 branches covered.">        if (currentLevel &lt; 2) {                  //change level for levels upto 2</span>
+<span class="fc" id="L609">            currentLevel++;</span>
+<span class="fc" id="L610">            definedLevels();</span>
+        }
+<span class="fc bfc" id="L612" title="All 2 branches covered.">        else if (currentLevel &gt; 2) {             //change level for unlimited levels</span>
+<span class="fc" id="L613">            unlimitedLevels();</span>
+        }
+<span class="pc bpc" id="L615" title="1 of 2 branches missed.">        else if (!gameOver) {                    //End of 3rd level</span>
+<span class="fc" id="L616">            gameOver = true;</span>
+<span class="fc" id="L617">            sortScoreBoard();</span>
+<span class="fc" id="L618">            endTime = 0;</span>
+        }
+<span class="fc" id="L620">    }</span>
+
+    /**
+     * Sorting scoreboard in decending order of their scores and storing the order in sortedScoreBoardList.
+     */
+    public void sortScoreBoard(){
+        //Resetting values in tankList to store the players temporarily
+<span class="fc" id="L627">        ArrayList&lt;Character&gt; tankList = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L628" title="All 2 branches covered.">        for (char i: playerArray){</span>
+<span class="fc" id="L629">            tankList.add(i);</span>
+        }
+        //Checking for smallest value
+<span class="fc bfc" id="L632" title="All 2 branches covered.">        for (int i = 0; i &lt; 4; i++){</span>
+<span class="fc" id="L633">            int maxScore = playerScoreMap.get(tankList.get(0));</span>
+<span class="fc" id="L634">            int maxSTankno = 0;</span>
+<span class="fc bfc" id="L635" title="All 2 branches covered.">            for (int j = 0; j &lt; tankList.size(); j++){</span>
+<span class="fc" id="L636">                int k = playerScoreMap.get(tankList.get(j));</span>
+<span class="pc bpc" id="L637" title="1 of 2 branches missed.">                if (maxScore &lt; k){</span>
+<span class="nc" id="L638">                    maxScore = k;</span>
+<span class="nc" id="L639">                    maxSTankno = j;</span>
+                }
+            }
+<span class="fc" id="L642">            char maxSTank = tankList.get(maxSTankno);</span>
+<span class="fc" id="L643">            sortedScoreBoardList.add(maxSTank);</span>
+<span class="fc" id="L644">            tankList.remove(maxSTankno);</span>
+        }
+<span class="fc" id="L646">    }</span>
+
+    public static void main(String[] args) {
+<span class="nc" id="L649">        PApplet.main(&quot;Tanks.App&quot;);</span>
+<span class="nc" id="L650">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

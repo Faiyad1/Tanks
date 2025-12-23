@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Projectile.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">tanks_scaffold</a> &gt; <a href="index.source.html" class="el_package">Tanks</a> &gt; <span class="el_source">Projectile.java</span></div><h1>Projectile.java</h1><pre class="source lang-java linenums">package Tanks;
+
+public class Projectile {
+<span class="fc" id="L4">    private boolean explode = false;</span>
+    private char shotBy;
+    private float radian;
+    private float power;
+    private float xSpeed;
+    private float ySpeed;
+<span class="fc" id="L10">    private float xaxis = 0;</span>
+<span class="fc" id="L11">    private float yaxis = 0;</span>
+    private int xcoordinate;
+    private int ycoordinate;
+<span class="fc" id="L14">    private int tick = 0;</span>
+
+<span class="fc" id="L16">    public Projectile(char shot, float rad, int pwr, int xcoord, int ycoord) {</span>
+<span class="fc" id="L17">        shotBy = shot;</span>
+<span class="fc" id="L18">        radian = rad;</span>
+<span class="fc" id="L19">        power = 2 + pwr * 0.16f;  //(540 - 60) / 100) / 30f</span>
+<span class="fc" id="L20">        xaxis = xcoord;</span>
+<span class="fc" id="L21">        yaxis = ycoord - 16;   //shot form turret height</span>
+<span class="fc" id="L22">        assigningSpeed();</span>
+<span class="fc" id="L23">    }</span>
+
+
+    public void assigningSpeed() {
+<span class="fc" id="L27">        xSpeed += power * (float) Math.sin(radian);</span>
+<span class="fc" id="L28">        ySpeed -= power * (float) Math.cos(radian);</span>
+<span class="fc" id="L29">    }</span>
+
+    /**
+     * calling method for drawing projectile
+     * If explode is set to true, destroyTerrain() function is called and this instance is removed once it is over.
+     */
+    public void executeProjectile(App app) {
+<span class="fc bfc" id="L36" title="All 2 branches covered.">        if (!explode) {</span>
+<span class="fc" id="L37">            projectileDiaplacement(app);</span>
+        } else {
+<span class="fc" id="L39">            tick++;</span>
+<span class="fc bfc" id="L40" title="All 2 branches covered.">            if (tick &gt; 6) {</span>
+<span class="fc" id="L41">                destroyTerrain(app);</span>
+<span class="fc" id="L42">                app.projectileList.remove(this);</span>
+            }
+        }
+<span class="fc" id="L45">    }</span>
+
+    /**
+     * Calculating and drawing Projectile, with scoring and initializing explosion on immediate impact
+     */
+    public void projectileDiaplacement(App app) {
+<span class="fc" id="L51">        float windPixel = App.wind * 0.03f / 30;  //0.03f / 30;</span>
+<span class="fc" id="L52">        float gravity = (3.6f / 30) * 2;</span>
+
+        //calculating acceleration
+<span class="fc" id="L55">        xSpeed += windPixel;</span>
+<span class="fc" id="L56">        ySpeed += gravity;</span>
+
+        //final coordinates
+<span class="fc" id="L59">        xaxis += xSpeed;</span>
+<span class="fc" id="L60">        yaxis += ySpeed;</span>
+
+
+        //inside map
+<span class="pc bpc" id="L64" title="1 of 6 branches missed.">        if (xaxis &gt;= 0 &amp;&amp; xaxis &lt; 864 &amp;&amp; yaxis &gt;= 0) {</span>
+            //touching terrain ground
+<span class="fc bfc" id="L66" title="All 2 branches covered.">            if ((int) (yaxis + 2) &gt;= App.terrain.get((int) xaxis)) {</span>
+<span class="fc" id="L67">                explode = true;</span>
+<span class="fc" id="L68">                xcoordinate = (int) xaxis;</span>
+<span class="fc" id="L69">                ycoordinate = App.terrain.get((int) xaxis);</span>
+<span class="fc" id="L70">                int[] blast = {xcoordinate, ycoordinate, 2, 1};</span>
+<span class="fc" id="L71">                app.blastList.add(blast);</span>
+<span class="fc" id="L72">                scores(app);</span>
+<span class="fc" id="L73">            } else {</span>
+                //drawing projectile
+<span class="fc" id="L75">                app.stroke(0, 0, 255);</span>
+<span class="fc" id="L76">                app.strokeWeight(2);</span>
+<span class="fc" id="L77">                app.fill(0, 0, 0);</span>
+<span class="fc" id="L78">                app.ellipse(xaxis, yaxis, 2, 2);</span>
+            }
+        }
+        //out of map and point of no return
+<span class="fc bfc" id="L82" title="All 2 branches covered.">        else if (yaxis &gt; 640) {</span>
+<span class="fc" id="L83">            app.projectileList.remove(this);</span>
+        }
+<span class="fc" id="L85">    }</span>
+
+    /**
+     * Scores on immediate projectile impact
+     */
+    public void scores(App app) {
+<span class="fc bfc" id="L91" title="All 2 branches covered.">        for (int i = app.tankList.size() - 1; i &gt;= 0; i--) {</span>
+<span class="fc" id="L92">            char temp = app.tankList.get(i);</span>
+<span class="fc" id="L93">            Tank plDetails = app.tankMap.get(temp);</span>
+
+<span class="fc" id="L95">            int xTankCoord = plDetails.getXaxis();</span>
+<span class="fc" id="L96">            int yTankCoord = app.terrain.get(xTankCoord);</span>
+
+            //distance formula for calculating distance;
+<span class="fc" id="L99">            float distance = (float) Math.sqrt(Math.pow(xcoordinate - xTankCoord, 2) + Math.pow(ycoordinate - yTankCoord, 2));</span>
+
+<span class="fc bfc" id="L101" title="All 2 branches covered.">            if (distance &lt;= 30.0f) {</span>
+<span class="fc" id="L102">                int damage = 60 - (int) (distance * 2);</span>
+
+                //updating health
+<span class="fc" id="L105">                int health = plDetails.getHealth();</span>
+<span class="fc bfc" id="L106" title="All 2 branches covered.">                if (health &gt; damage) {</span>
+<span class="fc" id="L107">                    plDetails.setHealth(app, health - damage);</span>
+                } else {
+<span class="fc" id="L109">                    plDetails.setHealth(app, 0);</span>
+<span class="fc" id="L110">                    damage = health;</span>
+                }
+
+                //score
+<span class="fc bfc" id="L114" title="All 2 branches covered.">                if (temp != shotBy) {</span>
+<span class="fc" id="L115">                    app.playerScoreMap.put(shotBy, app.playerScoreMap.get(shotBy) + damage);</span>
+                }
+            }
+        }
+<span class="fc" id="L119">    }</span>
+
+    /**
+     * Destroying terrain after explosion is over
+     */
+    public void destroyTerrain(App app) {
+<span class="fc bfc" id="L125" title="All 2 branches covered.">        for (int i = -30; i &lt;= 30; i++) {</span>
+<span class="pc bpc" id="L126" title="1 of 4 branches missed.">            if (xcoordinate + i &gt;= 0 &amp;&amp; xcoordinate + i &lt; 864) {</span>
+<span class="fc" id="L127">                int yco = app.terrain.get(xcoordinate + i);</span>
+
+                //distance formula for calculating y coordinates;
+<span class="fc" id="L130">                int distance = (int) Math.sqrt(Math.pow(30, 2) - Math.pow(i, 2));</span>
+<span class="fc" id="L131">                boolean terrainDestroyed = false;</span>
+
+                //Setting yaxis of terrain
+<span class="fc bfc" id="L134" title="All 2 branches covered.">                if (yco &lt; ycoordinate - distance) {</span>
+<span class="fc" id="L135">                    app.terrain.put(xcoordinate + i, yco + (distance * 2));</span>
+<span class="fc" id="L136">                    terrainDestroyed = true;</span>
+<span class="fc bfc" id="L137" title="All 2 branches covered.">                } else if ((yco &lt; ycoordinate + distance)) {</span>
+<span class="fc" id="L138">                    app.terrain.put(xcoordinate + i, ycoordinate + distance);</span>
+<span class="fc" id="L139">                    terrainDestroyed = true;</span>
+                }
+
+                //Initiating tank to fall
+<span class="fc bfc" id="L143" title="All 2 branches covered.">                if (terrainDestroyed) {</span>
+<span class="fc bfc" id="L144" title="All 2 branches covered.">                    for (int j = app.tankList.size() - 1; j &gt;= 0; j--) {</span>
+<span class="fc" id="L145">                        char temp = app.tankList.get(j);</span>
+<span class="fc" id="L146">                        Tank plDetails = app.tankMap.get(temp);</span>
+<span class="fc bfc" id="L147" title="All 2 branches covered.">                        if (plDetails.getXaxis() == xcoordinate + i) {</span>
+<span class="fc bfc" id="L148" title="All 2 branches covered.">                            if (!plDetails.getFall()) {</span>
+<span class="fc" id="L149">                                plDetails.tankFall(yco, shotBy);</span>
+                            }
+                        }
+                    }
+                }
+            }
+        }
+<span class="fc" id="L156">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

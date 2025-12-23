@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Tanks.SampleTest" tests="19" skipped="0" failures="0" errors="0" timestamp="2025-02-03T22:38:56" hostname="CORE" time="66.739">
+  <properties/>
+  <testcase name="gameplaySelfDestructionTest()" classname="Tanks.SampleTest" time="20.112"/>
+  <testcase name="gasmeplayBlindShootingTest()" classname="Tanks.SampleTest" time="44.427"/>
+  <testcase name="leftArrowKeyActionTest()" classname="Tanks.SampleTest" time="0.005"/>
+  <testcase name="sKeyActionTest()" classname="Tanks.SampleTest" time="0.001"/>
+  <testcase name="getFallTest()" classname="Tanks.SampleTest" time="0.002"/>
+  <testcase name="getFuelTest()" classname="Tanks.SampleTest" time="0.0"/>
+  <testcase name="rKeyActionTest()" classname="Tanks.SampleTest" time="0.025"/>
+  <testcase name="spacebarKeyActionTest()" classname="Tanks.SampleTest" time="0.039"/>
+  <testcase name="rightArrowKeyActionTest()" classname="Tanks.SampleTest" time="0.0"/>
+  <testcase name="tankFallTest()" classname="Tanks.SampleTest" time="0.001"/>
+  <testcase name="getHealthTest()" classname="Tanks.SampleTest" time="0.0"/>
+  <testcase name="wKeyActionTest()" classname="Tanks.SampleTest" time="0.0"/>
+  <testcase name="fKeyActionTest()" classname="Tanks.SampleTest" time="0.038"/>
+  <testcase name="getPowerTest()" classname="Tanks.SampleTest" time="0.001"/>
+  <testcase name="executeProjectileTest()" classname="Tanks.SampleTest" time="1.025"/>
+  <testcase name="setHealthTest()" classname="Tanks.SampleTest" time="0.001"/>
+  <testcase name="initialSettingsTest()" classname="Tanks.SampleTest" time="1.039"/>
+  <testcase name="getXaxisTest()" classname="Tanks.SampleTest" time="0.001"/>
+  <testcase name="getParachuteTest()" classname="Tanks.SampleTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[java.lang.ArrayIndexOutOfBoundsException: Index 3 out of bounds for length 3
+	at Tanks.App.definedLevels(App.java:155)
+	at Tanks.App.setup(App.java:148)
+	at processing.core.PApplet.handleDraw(PApplet.java:2401)
+	at processing.awt.PSurfaceAWT$12.callDraw(PSurfaceAWT.java:1557)
+	at processing.core.PSurfaceNone$AnimationThread.run(PSurfaceNone.java:316)
+java.lang.ArrayIndexOutOfBoundsException: Index 3 out of bounds for length 3
+	at Tanks.App.definedLevels(App.java:155)
+	at Tanks.App.setup(App.java:148)
+	at processing.core.PApplet.handleDraw(PApplet.java:2401)
+	at processing.awt.PSurfaceAWT$12.callDraw(PSurfaceAWT.java:1557)
+	at processing.core.PSurfaceNone$AnimationThread.run(PSurfaceNone.java:316)
+java.lang.ArrayIndexOutOfBoundsException: Index 3 out of bounds for length 3
+	at Tanks.App.definedLevels(App.java:155)
+	at Tanks.App.setup(App.java:148)
+	at processing.core.PApplet.handleDraw(PApplet.java:2401)
+	at processing.awt.PSurfaceAWT$12.callDraw(PSurfaceAWT.java:1557)
+	at processing.core.PSurfaceNone$AnimationThread.run(PSurfaceNone.java:316)
+java.lang.ArrayIndexOutOfBoundsException: Index 3 out of bounds for length 3
+	at Tanks.App.definedLevels(App.java:155)
+	at Tanks.App.setup(App.java:148)
+	at processing.core.PApplet.handleDraw(PApplet.java:2401)
+	at processing.awt.PSurfaceAWT$12.callDraw(PSurfaceAWT.java:1557)
+	at processing.core.PSurfaceNone$AnimationThread.run(PSurfaceNone.java:316)
+java.lang.ArrayIndexOutOfBoundsException: Index 3 out of bounds for length 3
+	at Tanks.App.definedLevels(App.java:155)
+	at Tanks.App.setup(App.java:148)
+	at processing.core.PApplet.handleDraw(PApplet.java:2401)
+	at processing.awt.PSurfaceAWT$12.callDraw(PSurfaceAWT.java:1557)
+	at processing.core.PSurfaceNone$AnimationThread.run(PSurfaceNone.java:316)
+java.lang.ArrayIndexOutOfBoundsException: Index 3 out of bounds for length 3
+	at Tanks.App.definedLevels(App.java:155)
+	at Tanks.App.setup(App.java:148)
+	at processing.core.PApplet.handleDraw(PApplet.java:2401)
+	at processing.awt.PSurfaceAWT$12.callDraw(PSurfaceAWT.java:1557)
+	at processing.core.PSurfaceNone$AnimationThread.run(PSurfaceNone.java:316)
+]]></system-err>
+</testsuite>

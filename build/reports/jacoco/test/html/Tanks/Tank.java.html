@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Tank.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">tanks_scaffold</a> &gt; <a href="index.source.html" class="el_package">Tanks</a> &gt; <span class="el_source">Tank.java</span></div><h1>Tank.java</h1><pre class="source lang-java linenums">package Tanks;
+
+public class Tank {
+    private char tank;
+    private int xaxis;
+<span class="fc" id="L6">    private float radian = 0.0f;</span>
+<span class="fc" id="L7">    private int power = 50;</span>
+<span class="fc" id="L8">    private int health = 100;</span>
+<span class="fc" id="L9">    private int fuel = 250;</span>
+<span class="fc" id="L10">    private int parachute = 3;</span>
+
+<span class="fc" id="L12">    private boolean fall = false;</span>
+<span class="fc" id="L13">    private boolean noParachute = false;</span>
+    private int yFallinital;
+    private int yFallCoordinate;
+    private int yFallRate;
+    private char shotBy;
+
+<span class="fc" id="L19">    public Tank(char t, int x){</span>
+<span class="fc" id="L20">        tank = t;</span>
+<span class="fc" id="L21">        xaxis = x;</span>
+<span class="fc" id="L22">    }</span>
+
+    public int getPower(){
+<span class="fc" id="L25">        return power;</span>
+    }
+    public int getFuel(){
+<span class="fc" id="L28">        return fuel;</span>
+    }
+    public int getParachute(){
+<span class="fc" id="L31">        return parachute;</span>
+    }
+    public int getXaxis(){
+<span class="fc" id="L34">        return xaxis;</span>
+    }
+    public int getHealth(){
+<span class="fc" id="L37">        return health;</span>
+    }
+    public boolean getFall(){
+<span class="fc" id="L40">        return fall;</span>
+    }
+
+    /**
+     * Assigning new value to health and checking if it is destroyed or not
+     */
+    public void setHealth(App app, int hl){
+<span class="fc" id="L47">        health = hl;</span>
+<span class="fc bfc" id="L48" title="All 2 branches covered.">        if (health &lt; 1){</span>
+<span class="fc" id="L49">            modifyPlayerMap(app);</span>
+        }
+<span class="fc bfc" id="L51" title="All 2 branches covered.">        if (power &gt; health) {</span>
+<span class="fc" id="L52">            power = health;</span>
+        }
+<span class="fc" id="L54">    }</span>
+
+    /**
+     * Assigning values for executing tank falling operations
+     */
+    public void tankFall(int ycoord, char sB){
+<span class="fc bfc" id="L60" title="All 2 branches covered.">        if (parachute &gt; 0){</span>
+<span class="fc" id="L61">            parachute -= 1;</span>
+<span class="fc" id="L62">            yFallRate = 2;</span>
+        } else{
+<span class="fc" id="L64">            noParachute = true;</span>
+<span class="fc" id="L65">            yFallRate = 4;</span>
+<span class="fc" id="L66">            shotBy = sB;</span>
+        }
+<span class="fc" id="L68">        fall = true;</span>
+<span class="fc" id="L69">        yFallinital = ycoord;</span>
+<span class="fc" id="L70">        yFallCoordinate = yFallinital;</span>
+<span class="fc" id="L71">    }</span>
+
+
+    /**
+     * Drawing tank and parachute
+     */
+    public void drawTank(App app) {
+
+<span class="fc" id="L79">        int[] tankColour = app.playerColourMap.get(tank);</span>
+        int yaxis;
+
+        //normal yaxis
+<span class="fc bfc" id="L83" title="All 2 branches covered.">        if (!fall) {</span>
+<span class="fc" id="L84">            yaxis = app.terrain.get(xaxis);</span>
+        }
+        //tank starts falling with parachute
+<span class="pc bpc" id="L87" title="1 of 4 branches missed.">        else if (fall &amp;&amp; !noParachute){</span>
+<span class="fc" id="L88">            yFallCoordinate += yFallRate;</span>
+<span class="fc" id="L89">            yaxis = yFallCoordinate;</span>
+<span class="fc" id="L90">            app.image(app.pimgParachuteTank, xaxis-30, yaxis -68);</span>
+        }
+        //tank starts falling without parachute
+        else{
+<span class="fc" id="L94">            yFallCoordinate += yFallRate;</span>
+<span class="fc" id="L95">            yaxis = yFallCoordinate;</span>
+        }
+
+        //drawing tank
+<span class="fc" id="L99">        app.noStroke();</span>
+<span class="fc" id="L100">        app.fill(tankColour[0], tankColour[1], tankColour[2]);</span>
+
+        //body (body size with height 15 width 30)
+<span class="fc" id="L103">        app.rect(xaxis - 10, yaxis - 10, 20, 10);</span>
+<span class="fc" id="L104">        app.ellipse(xaxis - 10, yaxis - 5, 10, 10);</span>
+<span class="fc" id="L105">        app.ellipse(xaxis + 10, yaxis - 5, 10, 10);//12</span>
+
+        //turret
+<span class="fc" id="L108">        app.rect(xaxis - 8, yaxis - 15, 16, 5);</span>
+<span class="fc" id="L109">        app.ellipse(xaxis - 8, yaxis - 12.5f, 5, 5);//4</span>
+<span class="fc" id="L110">        app.ellipse(xaxis + 8, yaxis - 12.5f, 5, 5);</span>
+
+        //design
+        //line(xaxis - 6, yaxis - 11, xa + 6, yaxis - 11);
+<span class="fc" id="L114">        app.stroke(0, 0, 0);</span>
+<span class="fc" id="L115">        app.strokeWeight(1);</span>
+<span class="fc" id="L116">        app.line(xaxis - 6, yaxis - 11, xaxis - 2, yaxis - 11);</span>
+<span class="fc" id="L117">        app.line(xaxis + 2, yaxis - 11, xaxis + 6, yaxis - 11);</span>
+<span class="fc" id="L118">        app.noStroke();</span>
+        //rect(xa - 6, yaxis - 11, 12, 1);
+
+
+        //turret gun
+<span class="fc" id="L123">        app.fill(0, 0, 0);</span>
+<span class="fc" id="L124">        app.translate(xaxis, yaxis - 10);</span>
+<span class="fc" id="L125">        app.rotate(radian);</span>
+        //system.out.println(  (t*3*(PI/180))  )//sometimes angle and sometimes radian
+
+<span class="fc" id="L128">        app.rect(-2, -16, 4, 11);//drawing opposite of y-axis</span>
+<span class="fc" id="L129">        app.ellipse(0, -16, 4, 4);</span>
+
+<span class="fc" id="L131">        app.rotate(-radian);</span>
+<span class="fc" id="L132">        app.translate(-xaxis, -(yaxis - 10));</span>
+
+        //pointing line above tank
+<span class="fc bfc" id="L135" title="All 2 branches covered.">        if (app.currentPlayer == tank) {</span>
+<span class="fc" id="L136">            app.stroke(0, 0, 0);</span>
+<span class="fc" id="L137">            app.strokeWeight(3);</span>
+<span class="fc" id="L138">            app.line(xaxis, yaxis - 150, xaxis, yaxis - 75);</span>
+<span class="fc" id="L139">            app.line(xaxis - 15, yaxis - 100, xaxis, yaxis - 75);</span>
+<span class="fc" id="L140">            app.line(xaxis + 15, yaxis - 100, xaxis, yaxis - 75);</span>
+        }
+
+
+        //tank placement operations
+        //tank under bottom of map
+<span class="pc bpc" id="L146" title="1 of 2 branches missed.">        if (app.terrain.get(xaxis) &gt;= app.height) {</span>
+<span class="nc" id="L147">            int[] blast = {xaxis, yaxis, 2, 1};</span>
+<span class="nc" id="L148">            app.blastList.add(blast);</span>
+<span class="nc" id="L149">            modifyPlayerMap(app);</span>
+<span class="nc" id="L150">            return;</span>
+        }
+
+        //fall damage
+<span class="fc bfc" id="L154" title="All 4 branches covered.">        if (noParachute &amp;&amp; yaxis &gt;= app.terrain.get(xaxis)) {</span>
+<span class="fc" id="L155">            int damage = app.terrain.get(xaxis) - yFallinital;</span>
+<span class="pc bpc" id="L156" title="1 of 2 branches missed.">            if (damage &gt; health){</span>
+<span class="fc" id="L157">                damage = health;</span>
+            }
+<span class="fc" id="L159">            health -= damage;</span>
+<span class="pc bpc" id="L160" title="1 of 2 branches missed.">            if (shotBy != tank) {</span>
+<span class="nc" id="L161">                app.playerScoreMap.put(shotBy, app.playerScoreMap.get(shotBy) + damage);</span>
+            }
+
+<span class="pc bpc" id="L164" title="1 of 2 branches missed.">            if (health &lt; 1) {</span>
+<span class="fc" id="L165">                int[] blast = {xaxis, yaxis, 1, 1};</span>
+<span class="fc" id="L166">                app.blastList.add(blast);</span>
+<span class="fc" id="L167">                modifyPlayerMap(app);</span>
+<span class="fc" id="L168">                return;</span>
+            }
+        }
+
+        //changing fall settings
+<span class="fc bfc" id="L173" title="All 4 branches covered.">        if (yaxis &gt;= app.terrain.get(xaxis) &amp;&amp; fall) {</span>
+<span class="fc" id="L174">            fall = false;</span>
+        }
+<span class="fc" id="L176">    }</span>
+
+    /**
+     * deleting tank from playerMap
+     */
+    public void modifyPlayerMap(App app){
+<span class="fc bfc" id="L182" title="All 2 branches covered.">        if (app.currentPlayer == tank){</span>
+<span class="fc" id="L183">            app.nextPlayer(app);</span>
+        }
+<span class="fc" id="L185">        app.tankMap.remove(tank);</span>
+<span class="pc bpc" id="L186" title="1 of 2 branches missed.">        for (int i = 0; i &lt; app.tankList.size(); i++){</span>
+<span class="fc" id="L187">            char temp = app.tankList.get(i);</span>
+<span class="fc bfc" id="L188" title="All 2 branches covered.">            if (temp == tank){</span>
+<span class="fc" id="L189">                app.tankList.remove(i);</span>
+<span class="fc" id="L190">                return;</span>
+            }
+        }
+<span class="nc" id="L193">    }</span>
+
+    /**
+     * Assigning and verifying if the user input can be accepted.
+     */
+    public void keyAction(App app, int key){
+<span class="pc bpc" id="L199" title="1 of 2 branches missed.">        if (key == 38) {                 //Up Arrow - Tank turret moves left</span>
+<span class="nc bnc" id="L200" title="All 2 branches missed.">            if (radian &gt; -(3.14f/2)){</span>
+<span class="nc" id="L201">                radian -= 0.1f;</span>
+            } else{
+<span class="nc" id="L203">                radian = -(3.14f/2);</span>
+            }
+        }
+<span class="pc bpc" id="L206" title="1 of 2 branches missed.">        else if (key == 40) {          //Down Arrow - Tank turret moves right</span>
+<span class="nc bnc" id="L207" title="All 2 branches missed.">            if (radian &lt; 3.14f/2){</span>
+<span class="nc" id="L208">                radian += 0.1f;</span>
+            } else{
+<span class="nc" id="L210">                radian = 3.14f/2;</span>
+            }
+        }
+
+<span class="fc bfc" id="L214" title="All 2 branches covered.">        else if (key == 37) {          //Left Arrow - Tank moves left across terrain</span>
+<span class="pc bpc" id="L215" title="2 of 4 branches missed.">            if (fuel &gt; 0 &amp;&amp; xaxis - 2 &gt;= 0) {</span>
+<span class="fc" id="L216">                xaxis -= 2;</span>
+<span class="fc" id="L217">                fuel -= 1;</span>
+            }
+        }
+<span class="fc bfc" id="L220" title="All 2 branches covered.">        else if (key == 39) {          //Right Arrow - Tank moves right across terrain</span>
+<span class="pc bpc" id="L221" title="2 of 4 branches missed.">            if (fuel &gt; 0 &amp;&amp; xaxis - 2 &lt; 864) {</span>
+<span class="fc" id="L222">                xaxis += 2;</span>
+<span class="fc" id="L223">                fuel -= 1;</span>
+            }
+        }
+
+<span class="fc bfc" id="L227" title="All 2 branches covered.">        else if (key == 87) {          //W - Turret power increases</span>
+<span class="fc" id="L228">            power += 36/30;</span>
+<span class="pc bpc" id="L229" title="1 of 2 branches missed.">            if (power &gt; 100){</span>
+<span class="nc" id="L230">                power = 100;</span>
+            }
+<span class="pc bpc" id="L232" title="1 of 2 branches missed.">            if (power &gt; health){</span>
+<span class="nc" id="L233">                power = health;</span>
+            }
+        }
+<span class="fc bfc" id="L236" title="All 2 branches covered.">        else if (key == 83) {          //S - Turret power decreases</span>
+<span class="fc" id="L237">            power -= 36/30;</span>
+<span class="pc bpc" id="L238" title="1 of 2 branches missed.">            if (power &lt; 0){</span>
+<span class="nc" id="L239">                power = 0;</span>
+            }
+        }
+
+<span class="fc bfc" id="L243" title="All 2 branches covered.">        else if (key == 32) {          //Spacebar - Fire a projectile (in these block of code)</span>
+<span class="fc bfc" id="L244" title="All 2 branches covered.">            if (!fall) {</span>
+<span class="fc" id="L245">                Projectile p = new Projectile(tank, radian, power, xaxis, app.terrain.get(xaxis));</span>
+<span class="fc" id="L246">                app.projectileList.add(p);</span>
+<span class="fc" id="L247">                app.nextPlayer(app);</span>
+
+<span class="fc" id="L249">                app.wind += app.random.nextInt(11) - 5;</span>
+<span class="fc" id="L250">            }</span>
+        }
+
+<span class="fc bfc" id="L253" title="All 2 branches covered.">        else if (key == 82) {          //R - Repair kit (in these block of code)</span>
+<span class="fc" id="L254">            int score = app.playerScoreMap.get(tank);</span>
+<span class="pc bpc" id="L255" title="1 of 2 branches missed.">            if (score &gt;= 20) {</span>
+<span class="pc bpc" id="L256" title="1 of 2 branches missed.">                if (health &gt; 80) {</span>
+<span class="fc" id="L257">                    health = 100;</span>
+                } else {
+<span class="nc" id="L259">                    health += 20;</span>
+                }
+<span class="fc" id="L261">                app.playerScoreMap.put(tank,score - 20);</span>
+            }
+<span class="fc" id="L263">        }</span>
+
+<span class="pc bpc" id="L265" title="1 of 2 branches missed.">        else if (key == 70) {          //F - Additional fuel</span>
+<span class="fc" id="L266">            int score = app.playerScoreMap.get(tank);</span>
+<span class="pc bpc" id="L267" title="1 of 2 branches missed.">            if (score &gt;= 10) {</span>
+<span class="fc" id="L268">                fuel += 200;</span>
+<span class="fc" id="L269">                app.playerScoreMap.put(tank,score - 10);</span>
+            }
+        }
+<span class="fc" id="L272">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>
