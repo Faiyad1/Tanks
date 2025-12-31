@@ -62,6 +62,8 @@ java -jar build/libs/I22-1.0.jar
 
 ### Testing
 
+Run the unit tests:
+
 ```bash
 ./gradlew test
 ```
@@ -92,9 +94,11 @@ The HTML report is generated at `build/reports/jacoco/test/html/index.html`.
 
 ## Gameplay
 
-- Damage and score are calculated based on distance from the explosion
-- Wind changes slightly after each shotwher
-- Parachutes reduce fall damage; running out makes falls harsher
+- **Turn-based Combat**: Players take turns aiming and firing projectiles.
+- **Scoring**: Damage and score are calculated based on distance from the explosion center.
+- **Wind**: Wind speed and direction change randomly, affecting projectile trajectory.
+- **Terrain**: Projectiles destroy terrain upon impact. Tanks take fall damage if terrain beneath them is destroyed.
+- **Parachutes**: Automatically deployed if a tank falls, reducing damage. Limited supply per player.
 
 ## Configuration
 
@@ -103,11 +107,11 @@ Game settings are defined in `config.json`:
 - Player colors
 - Tree sprites
 
-Level layouts are defined in text files (`level1.txt`, `level2.txt`, `level3.txt`):
+Level layouts are defined in a 28x20 grid in text files (`level1.txt`, `level2.txt`, `level3.txt`):
 - `X` - Terrain
 - `T` - Tree
 - `A-D` - Player spawn positions
-- Space - Empty
+- ` ` (Space) - Empty
 
 Images referenced in `config.json` must exist under `src/main/resources/Tanks`.
 
