@@ -110,7 +110,7 @@ Game settings are defined in `config.json`:
 Level layouts are defined in a 28x20 grid in text files (`level1.txt`, `level2.txt`, `level3.txt`):
 - `X` - Terrain
 - `T` - Tree
-- `A-D` - Player spawn positions
+- `A` - `D` - Player spawn positions
 - ` ` (Space) - Empty
 
 Images referenced in `config.json` must exist under `src/main/resources/Tanks`.
