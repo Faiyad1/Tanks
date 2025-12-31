@@ -8,9 +8,14 @@ The University of Sydney
 
 A turn-based artillery game built with Java and Processing.
 
+## Overview
+
+Tanks is a multiplayer artillery game where players take turns controlling tanks to destroy opponents. The game features terrain destruction, wind effects, and multiple themed levels.
+
+![Gameplay](images/gameplay_image.png)
+
 ## Table of Contents
 
-- [Description](#description)
 - [Features](#features)
 - [Requirements](#requirements)
 - [Building](#building)
@@ -20,12 +25,6 @@ A turn-based artillery game built with Java and Processing.
 - [Gameplay](#gameplay)
 - [Configuration](#configuration)
 - [Project Structure](#project-structure)
-
-## Description
-
-Tanks is a multiplayer artillery game where players take turns controlling tanks to destroy opponents. The game features terrain destruction, wind effects, and multiple themed levels.
-
-![Gameplay](images/gameplay_image.png)
 
 ## Features
 
